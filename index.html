@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assteroid - The Confusing Space Adventure</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <canvas id="gameCanvas"></canvas>
+        <div class="controls-info">
+            <h1>Assteroid</h1>
+            <p>Controls: Arrow keys to move</p>
+            <p>Score: <span id="score">0</span></p>
+            <p>Lives: <span id="lives">3</span></p>
+        </div>
+        <div id="typingChallenge" class="typing-challenge">
+            <p>Type this phrase to continue:</p>
+            <p id="challengeText"></p>
+            <input type="text" id="challengeInput" autocomplete="off">
+        </div>
+        <div id="spinnerChallenge" class="spinner-challenge">
+            <p>Get 3 to continue:</p>
+            <div class="spinner-container">
+                <div class="spinner">
+                    <div class="spinner-number">0</div>
+                </div>
+                <button id="spinButton">SPIN</button>
+            </div>
+        </div>
+        <div id="gameOverScreen" class="game-over">
+            <h2>YOU LOSE LOSER</h2>
+            <p>YOU SHOULD GET GOOD</p>
+            <p>Final Score: <span id="finalScore">0</span></p>
+            <button id="resetButton">Try Again (If You Dare)</button>
+        </div>
+        <div class="mobile-controls">
+            <button class="mobile-btn" id="upBtn">↑</button>
+            <div class="horizontal-controls">
+                <button class="mobile-btn" id="leftBtn">←</button>
+                <button class="mobile-btn" id="rightBtn">→</button>
+            </div>
+            <button class="mobile-btn" id="downBtn">↓</button>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html> 
