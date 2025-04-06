@@ -172,6 +172,9 @@ function showTypingChallenge() {
     challengeInput.value = '';
     typingChallenge.style.display = 'block';
     challengeInput.focus();
+    
+    // Stop the ship
+    ship.velocity = { x: 0, y: 0 };
 }
 
 // Show spinner challenge
@@ -181,16 +184,19 @@ function showSpinnerChallenge() {
     currentSpinnerValue = 0;
     spinnerNumber.textContent = currentSpinnerValue;
     spinnerChallenge.style.display = 'block';
+    
+    // Stop the ship
+    ship.velocity = { x: 0, y: 0 };
 }
 
 // Spin the spinner
 function spin() {
     const spins = 5 + Math.floor(Math.random() * 5);
-    const finalValue = 1 + Math.floor(Math.random() * 5); // Random number between 1 and 5
+    const finalValue = 1 + Math.floor(Math.random() * 5);
     let currentSpin = 0;
     
     const spinInterval = setInterval(() => {
-        currentSpinnerValue = (currentSpinnerValue % 5) + 1; // Cycle through 1-5
+        currentSpinnerValue = (currentSpinnerValue % 5) + 1;
         spinnerNumber.textContent = currentSpinnerValue;
         currentSpin++;
         
@@ -323,7 +329,7 @@ function update() {
         });
     }
     
-    // Ship controls - more responsive
+    // Ship controls - only when not in a challenge
     if (!isTypingChallengeActive && !isSpinnerChallengeActive) {
         const speed = ship.speed;
         
@@ -347,7 +353,7 @@ function update() {
         
         // Normalize diagonal movement
         if (ship.velocity.x !== 0 && ship.velocity.y !== 0) {
-            ship.velocity.x *= 0.7071; // 1/sqrt(2)
+            ship.velocity.x *= 0.7071;
             ship.velocity.y *= 0.7071;
         }
     }
@@ -418,6 +424,80 @@ function update() {
     }
 }
 
+// Draw ship
+function drawShip() {
+    ctx.save();
+    ctx.translate(ship.x, ship.y);
+    const angle = Math.atan2(mouseY - ship.y, mouseX - ship.x);
+    ctx.rotate(angle);
+    
+    // Ship body
+    ctx.fillStyle = '#ff0000';
+    ctx.beginPath();
+    ctx.moveTo(20, 0); // Nose
+    ctx.lineTo(-15, -10); // Left wing
+    ctx.lineTo(-10, 0); // Left back
+    ctx.lineTo(-15, 10); // Right wing
+    ctx.closePath();
+    ctx.fill();
+    
+    // Ship details
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(20, 0);
+    ctx.lineTo(-15, -10);
+    ctx.lineTo(-10, 0);
+    ctx.lineTo(-15, 10);
+    ctx.closePath();
+    ctx.stroke();
+    
+    // Cockpit
+    ctx.fillStyle = '#00ffff';
+    ctx.beginPath();
+    ctx.arc(5, 0, 5, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.restore();
+}
+
+// Draw asteroid
+function drawAsteroid(asteroid) {
+    ctx.save();
+    ctx.translate(asteroid.x, asteroid.y);
+    ctx.rotate(asteroid.rotation);
+    
+    // Random color for each asteroid
+    const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    
+    // Create irregular shape
+    const points = 8;
+    for (let i = 0; i < points; i++) {
+        const angle = (i / points) * Math.PI * 2;
+        const radius = asteroid.radius * (0.7 + Math.random() * 0.3);
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle) * radius;
+        if (i === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+    }
+    ctx.closePath();
+    ctx.fill();
+    
+    // Add some detail
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    ctx.restore();
+}
+
 // Draw game
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -427,22 +507,10 @@ function draw() {
     }
     
     // Draw ship
-    ctx.save();
-    ctx.translate(ship.x, ship.y);
-    const angle = Math.atan2(mouseY - ship.y, mouseX - ship.x);
-    ctx.rotate(angle);
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(15, 0);
-    ctx.lineTo(-10, -10);
-    ctx.lineTo(-10, 10);
-    ctx.closePath();
-    ctx.stroke();
-    ctx.restore();
+    drawShip();
     
     // Draw bullets
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = '#ffffff';
     bullets.forEach(bullet => {
         ctx.beginPath();
         ctx.arc(bullet.x, bullet.y, 2, 0, Math.PI * 2);
@@ -451,23 +519,7 @@ function draw() {
     
     // Draw asteroids
     asteroids.forEach(asteroid => {
-        ctx.save();
-        ctx.translate(asteroid.x, asteroid.y);
-        ctx.rotate(asteroid.rotation);
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        for (let i = 0; i < 8; i++) {
-            const angle = (i / 8) * Math.PI * 2;
-            const radius = asteroid.radius * (0.8 + Math.random() * 0.4);
-            const x = Math.cos(angle) * radius;
-            const y = Math.sin(angle) * radius;
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-        }
-        ctx.closePath();
-        ctx.stroke();
-        ctx.restore();
+        drawAsteroid(asteroid);
     });
 }
 
