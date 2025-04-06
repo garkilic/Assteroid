@@ -11,6 +11,8 @@ const spinButton = document.getElementById('spinButton');
 const gameOverScreen = document.getElementById('gameOverScreen');
 const finalScoreElement = document.getElementById('finalScore');
 const resetButton = document.getElementById('resetButton');
+const startScreen = document.getElementById('startScreen');
+const startButton = document.getElementById('startButton');
 
 // Mobile controls
 const upBtn = document.getElementById('upBtn');
@@ -30,6 +32,7 @@ window.addEventListener('resize', resizeCanvas);
 // Game variables
 let score = 0;
 let gameOver = false;
+let gameStarted = false;
 const ship = {
     x: canvas.width / 2,
     y: canvas.height / 2,
@@ -113,6 +116,11 @@ function resetGame() {
     gameOverScreen.style.display = 'none';
     scoreElement.textContent = score;
     livesElement.textContent = ship.lives;
+    
+    // Create initial asteroids
+    for (let i = 0; i < 3; i++) {
+        createAsteroid();
+    }
 }
 
 // Create asteroids
@@ -257,11 +265,39 @@ window.addEventListener('mousemove', (e) => {
     mouseY = e.clientY - rect.top;
 });
 
+// Check if device is mobile
+function isMobileDevice() {
+    return (window.innerWidth <= 768) || ('ontouchstart' in window);
+}
+
+// Start game function
+function startGame() {
+    gameStarted = true;
+    startScreen.style.display = 'none';
+    
+    // Show all game elements
+    canvas.style.display = 'block';
+    document.querySelector('.controls-info').style.display = 'block';
+    
+    // Only show mobile controls on mobile devices
+    if (isMobileDevice()) {
+        document.querySelector('.mobile-controls').style.display = 'block';
+    } else {
+        document.querySelector('.mobile-controls').style.display = 'none';
+    }
+    
+    // Reset and start the game
+    resetGame();
+    gameLoop();
+}
+
 // Update game state
 function update() {
-    if (gameOver) {
-        gameOverScreen.style.display = 'block';
-        finalScoreElement.textContent = score;
+    if (!gameStarted || gameOver) {
+        if (gameOver) {
+            gameOverScreen.style.display = 'block';
+            finalScoreElement.textContent = score;
+        }
         return;
     }
     
@@ -386,7 +422,7 @@ function update() {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    if (gameOver) {
+    if (!gameStarted || gameOver) {
         return;
     }
     
@@ -442,6 +478,22 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
+// Event listeners
+startButton.addEventListener('click', startGame);
+resetButton.addEventListener('click', resetGame);
+
 // Initialize mobile controls
-setupMobileControls();
-gameLoop(); 
+if (isMobileDevice()) {
+    setupMobileControls();
+}
+
+// Hide canvas and game elements initially
+canvas.style.display = 'none';
+document.querySelector('.controls-info').style.display = 'none';
+document.querySelector('.mobile-controls').style.display = 'none';
+typingChallenge.style.display = 'none';
+spinnerChallenge.style.display = 'none';
+gameOverScreen.style.display = 'none';
+
+// Show start screen
+startScreen.style.display = 'block'; 
